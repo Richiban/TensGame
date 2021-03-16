@@ -50,13 +50,18 @@ let update (msg: Msg) (state: State) : State * Cmd<_> =
         let total = List.sum state.prevClicks + num
 
         if total > 10 then
-            Finished(state.score, total), stopTick state.tickId
+            Finished(Bust(num :: state.prevClicks, score = state.score)), stopTick state.tickId
         elif total = 10 then
+            let scoreAdd =
+                2.0
+                ** ((List.length state.prevClicks - 1) |> float)
+                |> int
+
             Running
                 { state with
                       prevClicks = []
                       options = state.options |> removeIndex idx
-                      score = state.score + 1 },
+                      score = state.score + scoreAdd },
             Cmd.none
         else
             Running
@@ -71,7 +76,7 @@ let update (msg: Msg) (state: State) : State * Cmd<_> =
         let numOptions = List.length state.options
 
         if numOptions > 10 then
-            Finished(state.score, 0), Cmd.none
+            Finished(TimedOut state.score), stopTick state.tickId
         else
             Running
                 { state with

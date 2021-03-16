@@ -7,13 +7,17 @@ type RunningState =
       tickId: int }
     static member Default tickId =
         { prevClicks = []
-          options = [ 1; 5; 7; 9 ]
+          options = []
           score = 0
           tickId = tickId }
 
+type EndState =
+    | Bust of prevClicks: int list * score: int
+    | TimedOut of score: int
+
 type State =
     | NotStarted
-    | Finished of score: int * lastAttempt: int
+    | Finished of EndState
     | Running of RunningState
 
 type Msg =
